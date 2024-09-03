@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wujm1.tradesystem.mapper.ext.StockMapperExt">
+    <insert id="saveOrUpdateBatch" parameterType="java.util.List">
+        insert into stock (date, code, name,
+        open, close, high,
+        low, r_close, amount,
+        vol, amplitude, chg,
+        swap, reason, first_ceiling_time,
+        last_ceiling_time, ceiling_open_times, vol_rate,
+        fde, fcb, tdzlje, call_vol,
+        ceiling_type, free_market, ceiling_days,
+        call_vol_rate, last_date, call_amount,
+        remark, concepts)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.date}, #{item.code}, #{item.name},
+            #{item.open}, #{item.close}, #{item.high},
+            #{item.low}, #{item.rClose}, #{item.amount},
+            #{item.vol}, #{item.amplitude}, #{item.chg},
+            #{item.swap}, #{item.reason}, #{item.firstCeilingTime},
+            #{item.lastCeilingTime}, #{item.ceilingOpenTimes}, #{item.volRate},
+            #{item.fde}, #{item.fcb}, #{item.tdzlje}, #{item.callVol},
+            #{item.ceilingType}, #{item.freeMarket}, #{item.ceilingDays},
+            #{item.callVolRate}, #{item.lastDate}, #{item.callAmount},
+            #{item.remark}, #{item.concepts})
+        </foreach>
+        on duplicate key update
+        date = values(date), code = values(code), name = values(name),
+        open = values(open), close = values(close), high = values(high),
+        low = values(low), r_close = values(r_close), amount = values(amount),
+        vol = values(vol), amplitude = values(amplitude), chg = values(chg),
+        swap = values(swap), reason = values(reason), first_ceiling_time = values(first_ceiling_time),
+        last_ceiling_time = values(last_ceiling_time), ceiling_open_times = values(ceiling_open_times), vol_rate = values(vol_rate),
+        fde = values(fde), fcb = values(fcb), tdzlje = values(tdzlje), call_vol = values(call_vol),
+        ceiling_type = values(ceiling_type), free_market = values(free_market), ceiling_days = values(ceiling_days),
+        call_vol_rate = values(call_vol_rate), last_date = values(last_date), call_amount = values(call_amount),
+        remark = values(remark), concepts = values(concepts)
+    </insert>
+
+    <select id="queryCeilingDays" resultMap="BaseResultMap">
+        select n.*
+        from stock n
+                 left join stock t on n.date = t.last_date and n.code = t.code
+        where n.ceiling_days >= #{minCeilingDays,jdbcType=INTEGER}
+          and n.ceiling_days >= IFNULL(t.ceiling_days, 0)
+          and n.date >= #{startDate,jdbcType=VARCHAR}
+        order by n.date asc;
+    </select>
+
+
+    <select id="queryStockByDates" resultMap="BaseResultMap">
+        select *
+        from stock
+        where code = #{code,jdbcType=VARCHAR}
+          and date between #{startDate,jdbcType=VARCHAR}
+          and #{endDate,jdbcType=VARCHAR}
+    </select>
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wujm1.tradesystem.mapper.ext.TradeDateMapperExt">
+    <insert id="saveOrUpdateBatch" parameterType="com.wujm1.tradesystem.entity.TradeDate">
+        insert into trade_date (date, year, month,day, `remark`, `trade_date`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            <trim prefix=" (" suffix=")" suffixOverrides=",">
+                #{item.date,jdbcType=VARCHAR},
+                #{item.year,jdbcType=VARCHAR},
+                #{item.month,jdbcType=VARCHAR},
+                #{item.day,jdbcType=VARCHAR},
+                #{item.remark,jdbcType=VARCHAR},
+                #{item.tradeDate,jdbcType=VARCHAR}
+            </trim>
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        date = values(date),year=values(year),month=values(month),day=values(day),remark=values(remark),trade_date=values(trade_date)
+    </insert>
+    <select id="selectByDateTopN" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from (select
+        <include refid="Base_Column_List"/>
+        from trade_date
+        where date &lt;= #{date,jdbcType=VARCHAR}
+        order by date desc
+        limit #{topN,jdbcType=INTEGER}) t order by date asc
+    </select>
+
+    <select id="showAllTradeDate" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_date where date >= #{startDate,jdbcType=VARCHAR} and date &lt;= #{endDate,jdbcType=VARCHAR}
+        order by date asc
+    </select>
+</mapper>
