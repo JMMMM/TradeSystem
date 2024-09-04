@@ -21,8 +21,12 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         try {
+            String remoteAddr = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = request.getRemoteAddr();
+            }
             StringBuilder sb = new StringBuilder();
-            sb.append(request.getMethod() + " url: " + request.getRequestURL() + ",");
+            sb.append("IP: " + remoteAddr + "," + request.getMethod() + " url: " + request.getRequestURL() + ",");
             Enumeration headers = request.getHeaderNames();
             while (headers.hasMoreElements()) {
                 String header = headers.nextElement().toString();
