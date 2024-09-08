@@ -82,6 +82,13 @@ public class EmotionCrawler {
     }
 
     public void initEmotion(String today2){
+        //获取最近两个交易日
+        List<TradeDate> tradeDateLast10 = tradeDateMapperExt.selectByDateTopN(today2, 10);
+        List<String> dates = tradeDateLast10.stream().map(TradeDate::getDate).collect(Collectors.toList());
+        if (!dates.contains(today2)) {
+            log.info("当日不是交易日，不拉取数据");
+            return;
+        }
         List<TradeDate> tradeDateList = tradeDateMapperExt.selectByDateTopN(today2, 2);
         String yesterday2 = tradeDateList.get(0).getDate();
 
