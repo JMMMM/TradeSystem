@@ -101,14 +101,17 @@ public class NodeController {
         Workbook workbook = new XSSFWorkbook();
         //2.创建一个表
         Sheet sheet = workbook.createSheet("sheet1");
-
+        //yellow 加速
         CellStyle yellow = workbook.createCellStyle();
         yellow.setFillForegroundColor(IndexedColors.YELLOW.index);
         yellow.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         CellStyle blue = workbook.createCellStyle();
+        //分歧
         blue.setFillForegroundColor(IndexedColors.BLUE.index);
         blue.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         CellStyle green = workbook.createCellStyle();
+
+
         green.setFillForegroundColor(IndexedColors.GREEN.index);
         green.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         int row_num = 0;
@@ -145,35 +148,18 @@ public class NodeController {
         for (int i = 0; i < result.size(); i++) {
             List<Stock> lives = result.get(i);
             row = sheet.createRow(row_num + i);
+            Stock maxVolStock = lives.get(0);
             for (int col = 0; col < lives.size(); col++) {
                 Stock stock = lives.get(col);
                 if (Objects.isNull(stock) || StringUtils.isEmpty(stock.getName())) {
                     continue;
                 }
-                int ceiling_days = stock.getCeilingDays();
                 Cell cell = row.createCell(col);
-                if (isOne(stock)) {
-                    cell.setCellStyle(yellow);
+                maxVolStock = getBiggerVolStock(maxVolStock, stock);
+                if (Objects.equals(maxVolStock, stock)) {
+                    cell.setCellStyle(blue);
                 } else {
-                    if (ceiling_days >= 2) {
-                        int from = col - ceiling_days + 1;
-                        int to = col;
-                        BigDecimal now_vol = Objects.isNull(stock.getVol()) ? BigDecimal.ZERO : new BigDecimal(stock.getVol());
-                        BigDecimal max_vol = new BigDecimal(lives.subList(from, to).stream().max((a, b) -> {
-                            BigDecimal left = Objects.isNull(a.getVol()) ? BigDecimal.ZERO : new BigDecimal(a.getVol());
-                            BigDecimal right = Objects.isNull(b.getVol()) ? BigDecimal.ZERO : new BigDecimal(b.getVol());
-                            return left.compareTo(right);
-                        }).map(Stock::getVol).orElse(0L).toString());
-                        if (now_vol.compareTo(max_vol) >= 0) {
-                            cell.setCellStyle(blue);
-                        }
-
-                        if (isOne(lives.get(col - 1)) && !isOne(stock) && now_vol.compareTo(max_vol) >= 0) {
-                            cell.setCellStyle(blue);
-                        }
-
-                    }
-
+                    cell.setCellStyle(yellow);
                 }
                 cell.setCellValue(stock.getName() + stock.getCeilingDays());
             }
@@ -206,4 +192,17 @@ public class NodeController {
         return Objects.equals(stock.getLow(), stock.getHigh());
     }
 
+
+    public Stock getBiggerVolStock(Stock left, Stock right) {
+        if (Objects.isNull(left) || Objects.isNull(left.getVol())) {
+            return right;
+        }
+        if (Objects.isNull(right) || Objects.isNull(right.getVol())) {
+            return left;
+        }
+        if (left.getVol().compareTo(right.getVol()) > 0) {
+            return left;
+        }
+        return right;
+    }
 }
