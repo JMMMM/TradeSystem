@@ -159,7 +159,9 @@ public class NodeController {
                 if (Objects.equals(maxVolStock, stock)) {
                     cell.setCellStyle(blue);
                 } else {
-                    cell.setCellStyle(yellow);
+                    if (isOne(stock)) {
+                        cell.setCellStyle(yellow);
+                    }
                 }
                 cell.setCellValue(stock.getName() + stock.getCeilingDays());
             }
