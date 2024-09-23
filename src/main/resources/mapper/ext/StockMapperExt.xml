@@ -25,17 +25,17 @@
             #{item.callVolRate}, #{item.lastDate}, #{item.callAmount},
             #{item.remark}, #{item.concepts})
         </foreach>
---         on duplicate key update
---         date = values(date), code = values(code), name = values(name),
---         open = values(open), close = values(close), high = values(high),
---         low = values(low), r_close = values(r_close), amount = values(amount),
---         vol = values(vol), amplitude = values(amplitude), chg = values(chg),
---         swap = values(swap), reason = values(reason), first_ceiling_time = values(first_ceiling_time),
---         last_ceiling_time = values(last_ceiling_time), ceiling_open_times = values(ceiling_open_times), vol_rate = values(vol_rate),
---         fde = values(fde), fcb = values(fcb), tdzlje = values(tdzlje), call_vol = values(call_vol),
---         ceiling_type = values(ceiling_type), free_market = values(free_market), ceiling_days = values(ceiling_days),
---         call_vol_rate = values(call_vol_rate), last_date = values(last_date), call_amount = values(call_amount),
---         remark = values(remark), concepts = values(concepts)
+        -- on duplicate key update
+        -- date = values(date), code = values(code), name = values(name),
+        -- open = values(open), close = values(close), high = values(high),
+        -- low = values(low), r_close = values(r_close), amount = values(amount),
+        -- vol = values(vol), amplitude = values(amplitude), chg = values(chg),
+        -- swap = values(swap), reason = values(reason), first_ceiling_time = values(first_ceiling_time),
+        -- last_ceiling_time = values(last_ceiling_time), ceiling_open_times = values(ceiling_open_times), vol_rate = values(vol_rate),
+        -- fde = values(fde), fcb = values(fcb), tdzlje = values(tdzlje), call_vol = values(call_vol),
+        -- ceiling_type = values(ceiling_type), free_market = values(free_market), ceiling_days = values(ceiling_days),
+        -- call_vol_rate = values(call_vol_rate), last_date = values(last_date), call_amount = values(call_amount),
+        -- remark = values(remark), concepts = values(concepts)
     </insert>
 
     <select id="queryCeilingDays" resultMap="BaseResultMap">
@@ -52,8 +52,28 @@
     <select id="queryStockByDates" resultMap="BaseResultMap">
         select *
         from stock
-        where code = #{code,jdbcType=VARCHAR}
-          and date between #{startDate,jdbcType=VARCHAR}
-          and #{endDate,jdbcType=VARCHAR}
+        where 1 = 1
+        <if test="code != null">
+            and code = #{code,jdbcType=VARCHAR}
+        </if>
+        and date between #{startDate,jdbcType=VARCHAR}
+        and #{endDate,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryCybCeilingStock" resultMap="BaseResultMap">
+        select *
+        from stock
+        where code like '30%'
+          and date = #{date,jdbcType=VARCHAR}
+          and ceiling_days = #{ceilingDays,jdbcType=INTEGER}
+    </select>
+
+    <select id="queryStockByCodes" resultMap="BaseResultMap">
+        select *
+        from stock
+        where date = #{date,jdbcType=VARCHAR} and code in
+        <foreach collection="codes" item="code" open="(" close=")" separator=",">
+            #{code}
+        </foreach>
     </select>
 </mapper>

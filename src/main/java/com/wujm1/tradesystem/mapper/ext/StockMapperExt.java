@@ -22,4 +22,8 @@ public interface StockMapperExt extends StockMapper {
     List<Stock> queryCeilingDays(@Param("startDate") String startDate, @Param("minCeilingDays") int minCeilingDays);
 
     List<Stock> queryStockByDates(@Param("code") String code, @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    List<Stock> queryCybCeilingStock(@Param("date") String date, @Param("ceilingDays") Integer ceilingDays);
+
+    List<Stock> queryStockByCodes(@Param("codes") List<String> codes, @Param("date") String date);
 }
