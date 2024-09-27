@@ -221,7 +221,7 @@ public class ResultProcessor {
                 }
             }
 
-            if (StringUtils.isEmpty(stock.getLastCeilingTime()) && !StringUtils.isEmpty(stock.getFirstCeilingTime())) {
+            if(StringUtils.isEmpty(stock.getLastCeilingTime()) && !StringUtils.isEmpty(stock.getFirstCeilingTime())){
                 stock.setLastCeilingTime(stock.getFirstCeilingTime());
             }
 

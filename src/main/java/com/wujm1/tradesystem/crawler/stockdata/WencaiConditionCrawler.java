@@ -61,18 +61,16 @@ public class WencaiConditionCrawler {
 
                     log.info("拉取最近两个交易日数据：{},{},{}", tradeDateLast10.get(tradeDateLast10.size() - 1).getDate(), tradeDateLast10.get(tradeDateLast10.size() - 2).getDate(), tradeDateLast10.get(0).getDate());
                     List<Map<String, Object>> wencaiConditions = replaceCondition(tradeDateLast10.get(tradeDateLast10.size() - 1).getDate(), tradeDateLast10.get(tradeDateLast10.size() - 2).getDate(), tradeDateLast10.get(0).getDate());
-                    for (Map<String, Object> row : wencaiConditions) {
-                        log.info("构建wencai搜索语句:{}", JSONObject.toJSONString(row));
-                    }
                     WencaiCondition cookies = wencaiConditionMapperExt.selectByPrimaryKey("cookies");
                     ResultProcessor processor = new ResultProcessor();
 
                     int page = 1;
                     boolean flag = false;
-                    int count = 0;
                     log.info("执行数据爬取");
                     for (Map<String, Object> row : wencaiConditions) {
+                        int count = 0;
                         flag = true;
+                        log.info("爬取数据，query:{}, condition:{}, page:{}, count:{}", row.get("query").toString(), row.get("condition").toString(), page, count);
                         while (flag) {
                             JSONObject result = wencaiCrawler.crawler(row.get("query").toString(), row.get("condition").toString(), cookies.getCondition(), page);
                             List<Stock> rows = processor.processor(result, row.get("today").toString(), row.get("yesterday").toString());
@@ -83,7 +81,7 @@ public class WencaiConditionCrawler {
                             count += rows.size();
                             stockMapperExt.saveOrUpdateBatch(rows);
                             int finalCount = count;
-                            rows.forEach(i -> log.info("共写入{}个:{}", finalCount, i.toString()));
+                            rows.forEach(i -> log.info("写入:{}", i.toString()));
                             List<Concept> concepts = rows.stream().map(i -> {
                                 String[] concept = i.getConcepts().split(";");
                                 return Arrays.asList(concept).stream().map(j -> {
@@ -102,6 +100,8 @@ public class WencaiConditionCrawler {
                                 page++;
                             }
                         }
+                        log.info("爬取数据完成，总数:{}", count);
+
                     }
                     log.info("数据爬取完成");
                 } finally {

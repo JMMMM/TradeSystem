@@ -2,6 +2,7 @@ package com.wujm1.tradesystem.crawler.stockdata;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import java.io.IOException;
  * @date 2024-09-03 10:08
  */
 @Component
+@Slf4j
 public class WencaiCrawler {
     private static final String wencai_url = "https://www.iwencai.com/gateway/urp/v7/landing/getDataList?iwcpro=1";
     private final RestTemplate crawlerRestTemplate;
