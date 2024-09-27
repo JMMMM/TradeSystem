@@ -61,7 +61,9 @@ public class WencaiConditionCrawler {
 
                     log.info("拉取最近两个交易日数据：{},{},{}", tradeDateLast10.get(tradeDateLast10.size() - 1).getDate(), tradeDateLast10.get(tradeDateLast10.size() - 2).getDate(), tradeDateLast10.get(0).getDate());
                     List<Map<String, Object>> wencaiConditions = replaceCondition(tradeDateLast10.get(tradeDateLast10.size() - 1).getDate(), tradeDateLast10.get(tradeDateLast10.size() - 2).getDate(), tradeDateLast10.get(0).getDate());
-                    log.info("构建wencai搜索语句");
+                    for (Map<String, Object> row : wencaiConditions) {
+                        log.info("构建wencai搜索语句:{}", JSONObject.toJSONString(row));
+                    }
                     WencaiCondition cookies = wencaiConditionMapperExt.selectByPrimaryKey("cookies");
                     ResultProcessor processor = new ResultProcessor();
 

@@ -9,6 +9,7 @@ import com.wujm1.tradesystem.entity.Stock;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -219,6 +220,11 @@ public class ResultProcessor {
                     ex.printStackTrace();
                 }
             }
+
+            if (StringUtils.isEmpty(stock.getLastCeilingTime()) && !StringUtils.isEmpty(stock.getFirstCeilingTime())) {
+                stock.setLastCeilingTime(stock.getFirstCeilingTime());
+            }
+
             rows.add(stock);
         }
         return rows;
