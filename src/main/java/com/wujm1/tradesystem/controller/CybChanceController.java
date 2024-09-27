@@ -1,10 +1,10 @@
 package com.wujm1.tradesystem.controller;
 
+import cn.hutool.core.lang.Pair;
 import com.google.common.collect.Lists;
 import com.wujm1.tradesystem.entity.TradeDate;
 import com.wujm1.tradesystem.mapper.ext.TradeDateMapperExt;
 import com.wujm1.tradesystem.service.CybPremiumCalculator;
-import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

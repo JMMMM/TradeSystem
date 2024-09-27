@@ -1,11 +1,10 @@
 package com.wujm1.tradesystem.service;
 
+import cn.hutool.core.lang.Pair;
 import com.wujm1.tradesystem.entity.Stock;
 import com.wujm1.tradesystem.entity.TradeDate;
 import com.wujm1.tradesystem.mapper.ext.StockMapperExt;
 import com.wujm1.tradesystem.mapper.ext.TradeDateMapperExt;
-import javafx.beans.binding.StringBinding;
-import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
