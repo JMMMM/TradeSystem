@@ -57,8 +57,8 @@ public class EmotionCrawler {
     public JSONObject crawler(String today2) {
         Map<String, WencaiCondition> wencaiConditionMap = wencaiConditionMapperExt.selectAll().stream().collect(Collectors.toMap(WencaiCondition::getConditionName, Function.identity()));
         String cookies = wencaiConditionMap.get("cookies").getCondition();
-        String query = wencaiConditionMap.get("continue_query").getCondition();
-        String condition = wencaiConditionMap.get("continue_condition").getCondition();
+        String query = wencaiConditionMap.get("emotion_query").getCondition();
+        String condition = wencaiConditionMap.get("emotion_condition").getCondition();
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.COOKIE, cookies);
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
