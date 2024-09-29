@@ -5,57 +5,50 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.wujm1.tradesystem.entity.Stock;
+import com.wujm1.tradesystem.mapper.ext.StockMapperExt;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author wujiaming
  * @date 2024-02-21 9:01
  */
+@Component
 public class ResultProcessor {
+
+    private final StockMapperExt stockMapperExt;
+
+    public ResultProcessor(StockMapperExt stockMapperExt) {
+        this.stockMapperExt = stockMapperExt;
+    }
+
     public List<Stock> processor(JSONObject jsonObject, String today, String yesterday) {
         JSONArray datas = jsonObject.getJSONObject("answer").getJSONArray("components").getJSONObject(0)
                 .getJSONObject("data").getJSONArray("datas");
         Object[] objects = datas.stream().toArray();
         List<Stock> rows = Lists.newArrayList();
+        List<String> codes = Arrays.stream(objects).map(row -> {
+            JSONObject jo_row = (JSONObject) row;
+            String code = jo_row.getString("股票代码");
+            return code;
+        }).filter(row -> row != null).collect(Collectors.toList());
+
+        List<Stock> data_exists = stockMapperExt.queryStockByCodes(codes, today);
+
+        Map<String, Stock> data_exists_map = data_exists.stream().collect(Collectors.toMap(Stock::getCode, Function.identity()));
+
         for (Object row : objects) {
             JSONObject jo_row = (JSONObject) row;
-            Stock stock = new Stock();
-            stock.setDate("");
-            stock.setCode("");
-            stock.setName("");
-            stock.setOpen(new BigDecimal("0"));
-            stock.setClose(new BigDecimal("0"));
-            stock.setHigh(new BigDecimal("0"));
-            stock.setLow(new BigDecimal("0"));
-            stock.setrClose(new BigDecimal("0"));
-            stock.setAmount(new BigDecimal("0"));
-            stock.setVol(0L);
-            stock.setAmplitude(new BigDecimal("0"));
-            stock.setChg(new BigDecimal("0"));
-            stock.setSwap(new BigDecimal("0"));
-            stock.setReason("");
-            stock.setFirstCeilingTime("");
-            stock.setLastCeilingTime("");
-            stock.setCeilingOpenTimes(0);
-            stock.setVolRate(new BigDecimal("0"));
-            stock.setFde(new BigDecimal("0"));
-            stock.setFcb(new BigDecimal("0"));
-            stock.setTdzlje(new BigDecimal("0"));
-            stock.setCallVol(new BigDecimal("0"));
-            stock.setCeilingType("");
-            stock.setFreeMarket(new BigDecimal("0"));
-            stock.setCeilingDays(0);
-            stock.setCallVolRate(new BigDecimal("0"));
-            stock.setLastDate("");
-            stock.setCallAmount(new BigDecimal("0"));
-            stock.setRemark("");
-            stock.setConcepts("");
-
+            String code = jo_row.getString("股票代码");
+            Stock stock = data_exists_map.getOrDefault(code, stockInit());
             for (String key : jo_row.keySet()) {
                 try {
                     stock.setDate(today);
@@ -78,8 +71,8 @@ public class ResultProcessor {
                         }
                     }
                     if (key.contains("股票代码")) {
-                        String code = jo_row.getString(key);
-                        stock.setCode(code);
+                        String code1 = jo_row.getString(key);
+                        stock.setCode(code1);
                     }
                     if (key.contains("收盘价")) {
                         BigDecimal close = jo_row.getBigDecimal(key);
@@ -193,10 +186,9 @@ public class ResultProcessor {
                             stock.setAmplitude(BigDecimal.ZERO);
                         }
                     }
-                    if (key.contains("自由流通市值")) {
+                    if (key.contains("市值")) {
                         try {
                             stock.setFreeMarket(jo_row.getBigDecimal(key).setScale(2, RoundingMode.HALF_UP));
-
                         } catch (Exception ex) {
                             stock.setFreeMarket(BigDecimal.ZERO);
                         }
@@ -211,7 +203,7 @@ public class ResultProcessor {
                     if (key.contains("连续涨停天数")) {
                         stock.setCeilingDays(jo_row.getInteger(key));
                     }
-                    if (key.contains("竞价特大单净额")) {
+                    if (key.contains("主力资金流向")) {
                         BigDecimal tdzlje = jo_row.getBigDecimal(key);
                         stock.setTdzlje(tdzlje == null ? BigDecimal.ZERO : tdzlje.setScale(2,
                                 RoundingMode.HALF_UP));
@@ -221,7 +213,7 @@ public class ResultProcessor {
                 }
             }
 
-            if(StringUtils.isEmpty(stock.getLastCeilingTime()) && !StringUtils.isEmpty(stock.getFirstCeilingTime())){
+            if (StringUtils.isEmpty(stock.getLastCeilingTime()) && !StringUtils.isEmpty(stock.getFirstCeilingTime())) {
                 stock.setLastCeilingTime(stock.getFirstCeilingTime());
             }
 
@@ -229,4 +221,40 @@ public class ResultProcessor {
         }
         return rows;
     }
+
+    private Stock stockInit(){
+        Stock stock = new Stock();
+        stock.setDate("");
+        stock.setCode("");
+        stock.setName("");
+        stock.setOpen(new BigDecimal("0"));
+        stock.setClose(new BigDecimal("0"));
+        stock.setHigh(new BigDecimal("0"));
+        stock.setLow(new BigDecimal("0"));
+        stock.setrClose(new BigDecimal("0"));
+        stock.setAmount(new BigDecimal("0"));
+        stock.setVol(0L);
+        stock.setAmplitude(new BigDecimal("0"));
+        stock.setChg(new BigDecimal("0"));
+        stock.setSwap(new BigDecimal("0"));
+        stock.setReason("");
+        stock.setFirstCeilingTime("");
+        stock.setLastCeilingTime("");
+        stock.setCeilingOpenTimes(0);
+        stock.setVolRate(new BigDecimal("0"));
+        stock.setFde(new BigDecimal("0"));
+        stock.setFcb(new BigDecimal("0"));
+        stock.setTdzlje(new BigDecimal("0"));
+        stock.setCallVol(new BigDecimal("0"));
+        stock.setCeilingType("");
+        stock.setFreeMarket(new BigDecimal("0"));
+        stock.setCeilingDays(0);
+        stock.setCallVolRate(new BigDecimal("0"));
+        stock.setLastDate("");
+        stock.setCallAmount(new BigDecimal("0"));
+        stock.setRemark("");
+        stock.setConcepts("");
+        return stock;
+    }
+
 }
