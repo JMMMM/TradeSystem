@@ -54,7 +54,7 @@ public class EmotionCrawler {
         this.tradeDateMapperExt = tradeDateMapperExt;
     }
 
-    public JSONObject crawler(String today2) {
+    public JSONObject crawler(String today2, String today1, String yesterday2) {
         Map<String, WencaiCondition> wencaiConditionMap = wencaiConditionMapperExt.selectAll().stream().collect(Collectors.toMap(WencaiCondition::getConditionName, Function.identity()));
         String cookies = wencaiConditionMap.get("cookies").getCondition();
         String query = wencaiConditionMap.get("emotion_query").getCondition();
@@ -63,8 +63,8 @@ public class EmotionCrawler {
         headers.add(HttpHeaders.COOKIE, cookies);
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
-        params.add("query", query.replaceAll("today2", today2));
-        params.add("condition", condition.replaceAll("today2", today2));
+        params.add("query", query.replaceAll("today2", today2).replaceAll("today1", today1).replaceAll("yesterday2", yesterday2));
+        params.add("condition", condition.replaceAll("today2", today2).replaceAll("today1", today1).replaceAll("yesterday2", yesterday2));
         params.add("urp_sort_index", "指数代码");
         params.add("query_type", "zhishu");
         params.add("source", "Ths_iwencai_Xuangu");
@@ -81,7 +81,7 @@ public class EmotionCrawler {
         return JSON.parseObject(responseEntity.getBody());
     }
 
-    public void initEmotion(String today2){
+    public void initEmotion(String today2) {
         //获取最近两个交易日
         List<TradeDate> tradeDateLast10 = tradeDateMapperExt.selectByDateTopN(today2, 10);
         List<String> dates = tradeDateLast10.stream().map(TradeDate::getDate).collect(Collectors.toList());
@@ -91,8 +91,8 @@ public class EmotionCrawler {
         }
         List<TradeDate> tradeDateList = tradeDateMapperExt.selectByDateTopN(today2, 2);
         String yesterday2 = tradeDateList.get(0).getDate();
-
-        JSONObject jsonObject = this.crawler(today2);
+        String today1 = tradeDateList.get(1).getYear() + "年" + tradeDateList.get(0).getMonth() + "月" + tradeDateList.get(0).getDay() + "日";
+        JSONObject jsonObject = this.crawler(today2, today1, yesterday2);
         JSONArray datas = jsonObject.getJSONObject("answer").getJSONArray("components").getJSONObject(0)
                 .getJSONObject("data").getJSONArray("datas");
         JSONObject row = datas.getJSONObject(0);

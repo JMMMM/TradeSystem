@@ -121,7 +121,7 @@ public class NodeController {
             String date = tradeDates.get(i);
             Emotion emotion = emotionsMap.get(date);
             if (emotion == null) {
-                break;
+                continue;
             }
             Cell cell = row.createCell(i);
 
