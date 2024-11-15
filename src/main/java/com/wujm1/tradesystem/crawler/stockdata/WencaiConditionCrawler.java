@@ -14,10 +14,7 @@ import com.wujm1.tradesystem.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -74,7 +71,24 @@ public class WencaiConditionCrawler {
                         flag = true;
                         log.info("爬取数据，query:{}, condition:{}, page:{}, count:{}", row.get("query").toString(), row.get("condition").toString(), page, count);
                         while (flag) {
-                            JSONObject result = wencaiCrawler.crawler(row.get("query").toString(), row.get("condition").toString(), cookies.getCondition(), page);
+                            int times = 0;
+                            JSONObject result = null;
+                            while (true) {
+                                result = wencaiCrawler.crawler(row.get("query").toString(), row.get("condition").toString(), cookies.getCondition(), page);
+                                if (times <= 3 && Objects.equals(result.getInteger("error_code"), -9999)) {
+                                    log.info("爬取数据失败，触发重试机制，等待5s,返回:{}", Objects.isNull(result) ? "" : result.toString());
+                                    Thread.sleep(5000);
+                                    continue;
+                                } else {
+                                    break;
+                                }
+                            }
+
+                            if (times > 3) {
+                                log.error("爬取数据失败:{}", Objects.isNull(result) ? "" : result.toString());
+                                break;
+                            }
+
                             List<Stock> rows = resultProcessor.processor(result, row.get("today").toString(), row.get("yesterday").toString());
                             if (rows.size() == 0) {
                                 page = 1;
