@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wujm1.tradesystem.mapper.ext.StockStatisticsMapperExt">
+  <insert id="saveOrUpdateBatch" parameterType="java.util.List">
+    insert IGNORE into stock_statistics (date, code, name,
+    group_name, ceiling_days, ceiling_type,
+    ceiling_time, reason)
+    values 
+    <foreach collection="list" item="item" separator=",">
+      (#{item.date,jdbcType=VARCHAR}, #{item.code,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR},
+      #{item.groupName,jdbcType=VARCHAR}, #{item.ceilingDays,jdbcType=INTEGER}, #{item.ceilingType,jdbcType=VARCHAR},
+      #{item.ceilingTime,jdbcType=VARCHAR}, #{item.reason,jdbcType=LONGVARCHAR})
+    </foreach>
+    on duplicate key update
+    date = values(date), code = values(code), name = values(name),
+    group_name = values(group_name), ceiling_days = values(ceiling_days), ceiling_type = values(ceiling_type),
+    ceiling_time = values(ceiling_time), reason = values(reason)
+  </insert>
+</mapper>

@@ -57,7 +57,7 @@
 <!--		  enableSelectByExample="false"-->
 <!--		  selectByExampleQueryId="false">-->
 <!--	  </table>-->
-	  <table tableName="emotion" domainObjectName="Emotion"
+	  <table tableName="stock_statistics" domainObjectName="StockStatistics"
 		  enableCountByExample="false"
 		  enableUpdateByExample="false"
 		  enableDeleteByExample="false"

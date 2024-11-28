@@ -1,12 +1,15 @@
 package com.wujm1.tradesystem.controller;
 
 import com.wujm1.tradesystem.crawler.emotiondata.EmotionCrawler;
+import com.wujm1.tradesystem.crawler.jiuyangongshe.JiuyangongsheCrawler;
 import com.wujm1.tradesystem.crawler.stockdata.WencaiConditionCrawler;
 import com.wujm1.tradesystem.crawler.tradedate.TradeDateCrawler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @Desctiption <Template>
@@ -20,11 +23,13 @@ public class TradeDateController {
     private final TradeDateCrawler tradeDateCrawler;
     private final WencaiConditionCrawler wencaiConditionCrawler;
     private final EmotionCrawler emotionCrawler;
+    private final JiuyangongsheCrawler jiuyangongsheCrawler;
 
-    public TradeDateController(TradeDateCrawler tradeDateCrawler, WencaiConditionCrawler wencaiConditionCrawler, EmotionCrawler emotionCrawler) {
+    public TradeDateController(TradeDateCrawler tradeDateCrawler, WencaiConditionCrawler wencaiConditionCrawler, EmotionCrawler emotionCrawler, JiuyangongsheCrawler jiuyangongsheCrawler) {
         this.tradeDateCrawler = tradeDateCrawler;
         this.wencaiConditionCrawler = wencaiConditionCrawler;
         this.emotionCrawler = emotionCrawler;
+        this.jiuyangongsheCrawler = jiuyangongsheCrawler;
     }
 
     @GetMapping("/init")
@@ -42,4 +47,8 @@ public class TradeDateController {
         emotionCrawler.initEmotion(date);
     }
 
+    @GetMapping("/jiuyangongshe")
+    public List jiuyangongshe(@RequestParam("date") String date) {
+        return jiuyangongsheCrawler.initJiuyangongshe(date);
+    }
 }
