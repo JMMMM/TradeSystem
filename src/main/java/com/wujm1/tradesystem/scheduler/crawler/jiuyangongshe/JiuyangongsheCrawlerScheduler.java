@@ -20,7 +20,7 @@ public class JiuyangongsheCrawlerScheduler {
     @Autowired
     private JiuyangongsheCrawler jiuyangongsheCrawler;
 
-    @Scheduled(cron = "0 0 15 45 * ?")
+    @Scheduled(cron = "0 0 16 * * ?")
     public void run() {
         String today = DateUtils.getDateStr(new Date(), "yyyyMMdd");
         log.info("爬取韭菜公社交易数据开始");
