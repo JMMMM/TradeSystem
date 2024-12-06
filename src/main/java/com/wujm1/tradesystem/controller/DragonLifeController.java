@@ -84,9 +84,11 @@ public class DragonLifeController {
         row_num = 0;
         Row row2;
         Map<String, Row> rowMap = new HashMap<>();
+        Map<String, Integer> ceilingCounting = new HashMap<>();
         for (Stock dragon : dragons) {
             String name = dragon.getName();
             String date = dragon.getDate();
+            Integer ceiling = dragon.getCeilingDays();
             int index = dateMap.get(date);
             if (rowMap.get(name) == null) {
                 row_num++;
@@ -97,13 +99,17 @@ public class DragonLifeController {
 
             Cell cell = row2.createCell(index);
             if (dragon.getRemark().equals("主升")) {
+                if (ceiling > 0) {
+                    Integer last = ceilingCounting.getOrDefault(name, 0);
+                    ceilingCounting.put(name, last + 1);
+                }
                 cell.setCellStyle(yellow);
             } else if (dragon.getRemark().equals("退潮")) {
                 cell.setCellStyle(green);
             } else if (dragon.getRemark().equals("结束")) {
                 cell.setCellStyle(blue);
             }
-            cell.setCellValue(name);
+            cell.setCellValue(name + "(" + ceilingCounting.get(name) + ")");
             rowMap.put(name, row2);
         }
 
