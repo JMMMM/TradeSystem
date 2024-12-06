@@ -76,4 +76,12 @@
             #{code}
         </foreach>
     </select>
+
+    <select id="queryDragonStock" resultMap="BaseResultMap">
+        select *
+        from stock
+        where date between #{startDate,jdbcType=VARCHAR}
+          and #{endDate,jdbcType=VARCHAR}
+          and length (remark) >0
+    </select>
 </mapper>

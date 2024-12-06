@@ -39,7 +39,10 @@ public class TradeDateController {
 
     @GetMapping("/wencai")
     public void wencai(@RequestParam("date") String date) {
-        wencaiConditionCrawler.initSearchCondition(date);
+        String[] dates = date.split(",");
+        for (String d : dates) {
+            wencaiConditionCrawler.initSearchCondition(d);
+        }
     }
 
     @GetMapping("/emotion")
