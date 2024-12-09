@@ -2,6 +2,7 @@ package com.wujm1.tradesystem.controller;
 
 import com.alibaba.druid.util.StringUtils;
 import com.google.common.collect.Maps;
+import com.wujm1.tradesystem.constants.StockConstants;
 import com.wujm1.tradesystem.entity.Emotion;
 import com.wujm1.tradesystem.entity.Stock;
 import com.wujm1.tradesystem.entity.TradeDate;
@@ -83,8 +84,9 @@ public class DragonLifeController {
 
         row_num = 0;
         Row row2;
-        Map<String, Row> rowMap = new HashMap<>();
-        Map<String, Integer> ceilingCounting = new HashMap<>();
+        Map<String, Row> rowMap = Maps.newHashMap();
+        Map<String, Integer> ceilingCounting = Maps.newHashMap();
+        Map<String, Stock> lastStockMap = Maps.newHashMap();
         for (Stock dragon : dragons) {
             String name = dragon.getName();
             String date = dragon.getDate();
@@ -98,19 +100,30 @@ public class DragonLifeController {
             }
 
             Cell cell = row2.createCell(index);
-            if (dragon.getRemark().equals("主升")) {
+            if (dragon.getRemark().equals(StockConstants.UPING)) {
                 if (ceiling > 0) {
-                    Integer last = ceilingCounting.getOrDefault(name, 0);
-                    ceilingCounting.put(name, last + 1);
+                    if (lastStockMap.containsKey(name) && (lastStockMap.get(name).getHigh().compareTo(dragon.getHigh()) > 0 || tradeDates.indexOf(dragon.getDate()) - tradeDates.indexOf(lastStockMap.get(name).getDate()) >= 3)) {
+                        //不能反包就重置
+                        ceilingCounting.put(name, 1);
+                    } else {
+                        Integer last = ceilingCounting.getOrDefault(name, 0);
+                        ceilingCounting.put(name, last + 1);
+                    }
                 }
                 cell.setCellStyle(yellow);
-            } else if (dragon.getRemark().equals("退潮")) {
+            } else if (dragon.getRemark().equals(StockConstants.DOWNING)) {
+                ceilingCounting.put(name, 0);
                 cell.setCellStyle(green);
-            } else if (dragon.getRemark().equals("结束")) {
+            } else if (dragon.getRemark().equals(StockConstants.ENDING)) {
                 cell.setCellStyle(blue);
             }
-            cell.setCellValue(name + "(" + ceilingCounting.get(name) + ")");
+            if (ceilingCounting.getOrDefault(name, 0) == 0) {
+                cell.setCellValue(name);
+            } else {
+                cell.setCellValue(name + "(" + ceilingCounting.get(name) + ")");
+            }
             rowMap.put(name, row2);
+            lastStockMap.put(name, dragon);
         }
 
         // 保存Excel文件
