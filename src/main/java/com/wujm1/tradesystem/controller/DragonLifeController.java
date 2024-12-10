@@ -116,6 +116,8 @@ public class DragonLifeController {
                 cell.setCellStyle(green);
             } else if (dragon.getRemark().equals(StockConstants.ENDING)) {
                 cell.setCellStyle(blue);
+            } else if (dragon.getRemark().equals(StockConstants.PD)) {
+                ceilingCounting.put(name, 0);
             }
             if (ceilingCounting.getOrDefault(name, 0) == 0) {
                 cell.setCellValue(name);
