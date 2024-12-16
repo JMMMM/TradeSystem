@@ -40,7 +40,9 @@ public class ResultProcessor {
             String code = jo_row.getString("股票代码");
             return code;
         }).filter(row -> row != null).collect(Collectors.toList());
-
+        if (codes.size() == 0) {
+            return rows;
+        }
         List<Stock> data_exists = stockMapperExt.queryStockByCodes(codes, today);
 
         Map<String, Stock> data_exists_map = data_exists.stream().collect(Collectors.toMap(Stock::getCode, Function.identity()));
@@ -222,7 +224,7 @@ public class ResultProcessor {
         return rows;
     }
 
-    private Stock stockInit(){
+    private Stock stockInit() {
         Stock stock = new Stock();
         stock.setDate("");
         stock.setCode("");
