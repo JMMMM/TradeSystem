@@ -60,6 +60,6 @@ public class TradeDateController {
 
     @GetMapping("/kaipanla")
     public List kaipanla(@RequestParam("date") String date) {
-        return kaipanlaTdCrawler.initKaipanla(date);
+        return kaipanlaTdCrawler.initKaipanlaTd(date);
     }
 }

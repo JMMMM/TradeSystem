@@ -8,10 +8,8 @@ import com.wujm1.tradesystem.entity.WencaiCondition;
 import com.wujm1.tradesystem.mapper.ext.StockKplMapperExt;
 import com.wujm1.tradesystem.mapper.ext.WencaiConditionMapperExt;
 import com.wujm1.tradesystem.utils.DateUtils;
+import com.wujm1.tradesystem.utils.OkClientUtils;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,22 +30,14 @@ public class KaipanlaTdCrawler {
     @Autowired
     private StockKplMapperExt stockKplMapperExt;
 
-    public List<StockKpl> initKaipanla(String yyyyMMdd) {
+    public List<StockKpl> initKaipanlaTd(String yyyyMMdd) {
         WencaiCondition wencaiCondition = wencaiConditionMapperExt.selectByPrimaryKey("kaipanla");
         String url = JSONObject.parseObject(wencaiCondition.getCondition()).getString("url");
         String yyyyMMdd2 = DateUtils.changeDateFormat(yyyyMMdd, "yyyyMMdd", "yyyy-MM-dd");
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
         List<StockKpl> result = Lists.newArrayList();
-
         for (int i = 1; i <= 5; i++) {
-            Request request = new Request.Builder()
-                    .url(String.format(url, yyyyMMdd2, 1)).get().build();
-            Response response = null;
-            String json = null;
             try {
-                response = client.newCall(request).execute();
-                json = response.body().string();
+                String json = OkClientUtils.get(String.format(url, yyyyMMdd2, i));
                 List<StockKpl> parse = parse(yyyyMMdd, json);
                 result.addAll(parse);
             } catch (IOException e) {
@@ -86,9 +76,9 @@ public class KaipanlaTdCrawler {
         }
         return result;
     }
-
-    public static void main(String[] args) {
-        KaipanlaTdCrawler kaipanlaTdCrawler = new KaipanlaTdCrawler();
-        kaipanlaTdCrawler.initKaipanla("20250210");
-    }
+//
+//    public static void main(String[] args) {
+//        KaipanlaTdCrawler kaipanlaTdCrawler = new KaipanlaTdCrawler();
+//        kaipanlaTdCrawler.initKaipanlaTd("20250210");
+//    }
 }
