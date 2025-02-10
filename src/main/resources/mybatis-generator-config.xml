@@ -32,7 +32,7 @@
 	    <!-- 从数据库返回的值被清理前后的空格 -->
 	    <property name="trimStrings" value="true" />
 	 </javaModelGenerator>
- 
+
 	 <!-- 生成映射文件的包名和位置 -->
 	 <sqlMapGenerator targetPackage="mapper"  targetProject="src/main/resources">
 	    <property name="enableSubPackages" value="false" />
@@ -57,13 +57,13 @@
 <!--		  enableSelectByExample="false"-->
 <!--		  selectByExampleQueryId="false">-->
 <!--	  </table>-->
-	  <table tableName="stock_statistics" domainObjectName="StockStatistics"
-		  enableCountByExample="false"
-		  enableUpdateByExample="false"
-		  enableDeleteByExample="false"
-		  enableSelectByExample="false"
-		  selectByExampleQueryId="false">
-	  </table>
+<!--	  <table tableName="stock_statistics" domainObjectName="StockStatistics"-->
+<!--		  enableCountByExample="false"-->
+<!--		  enableUpdateByExample="false"-->
+<!--		  enableDeleteByExample="false"-->
+<!--		  enableSelectByExample="false"-->
+<!--		  selectByExampleQueryId="false">-->
+<!--	  </table>-->
 <!--	  <table tableName="trade_date" domainObjectName="TradeDate"-->
 <!--		  enableCountByExample="false"-->
 <!--		  enableUpdateByExample="false"-->
@@ -78,5 +78,12 @@
 <!--			 enableSelectByExample="false"-->
 <!--			 selectByExampleQueryId="false">-->
 <!--	  </table>-->
+	  <table tableName="stock_kpl" domainObjectName="StockKpl"
+			 enableCountByExample="false"
+			 enableUpdateByExample="false"
+			 enableDeleteByExample="false"
+			 enableSelectByExample="false"
+			 selectByExampleQueryId="false">
+	  </table>
   </context>
 </generatorConfiguration>
