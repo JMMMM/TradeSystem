@@ -31,11 +31,10 @@ public class KaipanlaConceptsCrawlerScheduler {
     public void run() {
         String today = DateUtils.getDateStr(new Date(), "yyyyMMdd");
         List<Stock> stocks = stockMapperExt.queryStockByDates(null, today, today);
+        log.info("爬取开盘啦概念开始");
         for (Stock stock : stocks) {
-            log.info("爬取开盘啦概念开始");
             kaipanlaConceptsCrawler.initKaipanlaConcepts(stock.getCode());
-            log.info("爬取开盘啦概念结束");
         }
-        
+        log.info("爬取开盘啦概念结束");
     }
 }
