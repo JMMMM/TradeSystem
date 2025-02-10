@@ -27,14 +27,11 @@ public class KaipanlaConceptsCrawlerScheduler {
     @Autowired
     private StockMapperExt stockMapperExt;
     
-    @Scheduled(cron = "0 0 23 * * ?")
+    @Scheduled(cron = "0 30 23 * * ?")
     public void run() {
         String today = DateUtils.getDateStr(new Date(), "yyyyMMdd");
-        List<Stock> stocks = stockMapperExt.queryStockByDates(null, today, today);
         log.info("爬取开盘啦概念开始");
-        for (Stock stock : stocks) {
-            kaipanlaConceptsCrawler.initKaipanlaConcepts(stock.getCode());
-        }
+        kaipanlaConceptsCrawler.initKaipanlaConcepts(today);
         log.info("爬取开盘啦概念结束");
     }
 }

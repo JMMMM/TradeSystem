@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.wujm1.tradesystem.entity.Concept;
+import com.wujm1.tradesystem.entity.Stock;
 import com.wujm1.tradesystem.entity.StockKpl;
 import com.wujm1.tradesystem.entity.WencaiCondition;
 import com.wujm1.tradesystem.mapper.ext.ConceptMapperExt;
 import com.wujm1.tradesystem.mapper.ext.StockKplMapperExt;
+import com.wujm1.tradesystem.mapper.ext.StockMapperExt;
 import com.wujm1.tradesystem.mapper.ext.WencaiConditionMapperExt;
 import com.wujm1.tradesystem.utils.OkClientUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +26,24 @@ import java.util.List;
 @Component
 @Slf4j
 public class KaipanlaConceptsCrawler {
-
+    
     @Autowired
     private WencaiConditionMapperExt wencaiConditionMapperExt;
-
+    
     @Autowired
     private ConceptMapperExt conceptMapperExt;
-
-    public List<Concept> initKaipanlaConcepts(String stockCode) {
+    
+    @Autowired
+    private StockMapperExt stockMapperExt;
+    
+    public void initKaipanlaConcepts(String yyyyMMdd) {
+        List<Stock> stocks = stockMapperExt.queryStockByDates(null, yyyyMMdd, yyyyMMdd);
+        for (Stock stock : stocks) {
+            initCore(stock.getCode());
+        }
+    }
+    
+    public List<Concept> initCore(String stockCode) {
         WencaiCondition wencaiCondition = wencaiConditionMapperExt.selectByPrimaryKey("kaipanla");
         String url = JSONObject.parseObject(wencaiCondition.getCondition()).getString("url");
         List<Concept> result = Lists.newArrayList();
@@ -44,7 +56,7 @@ public class KaipanlaConceptsCrawler {
         conceptMapperExt.saveOrUpdateBatch(result);
         return result;
     }
-
+    
     public List<Concept> parse(String stockCode, String json) {
         JSONObject jsonObject = JSONObject.parseObject(json);
         JSONArray data = jsonObject.getJSONArray("info").getJSONArray(0);
