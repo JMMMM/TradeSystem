@@ -15,6 +15,7 @@ import com.wujm1.tradesystem.utils.OkClientUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,40 +27,50 @@ import java.util.List;
 @Component
 @Slf4j
 public class KaipanlaConceptsCrawler {
-    
+
     @Autowired
     private WencaiConditionMapperExt wencaiConditionMapperExt;
-    
+
     @Autowired
     private ConceptMapperExt conceptMapperExt;
-    
+
     @Autowired
     private StockMapperExt stockMapperExt;
-    
+
     public void initKaipanlaConcepts(String yyyyMMdd) {
         List<Stock> stocks = stockMapperExt.queryStockByDates(null, yyyyMMdd, yyyyMMdd);
+        WencaiCondition wencaiCondition = wencaiConditionMapperExt.selectByPrimaryKey("kaipanla");
+        String url = JSONObject.parseObject(wencaiCondition.getCondition()).getString("concepts_url");
         for (Stock stock : stocks) {
-            initCore(stock.getCode());
+            initCore(url, stock.getCode());
         }
     }
-    
+
     public List<Concept> initCore(String stockCode) {
         WencaiCondition wencaiCondition = wencaiConditionMapperExt.selectByPrimaryKey("kaipanla");
-        String url = JSONObject.parseObject(wencaiCondition.getCondition()).getString("url");
+        String url = JSONObject.parseObject(wencaiCondition.getCondition()).getString("concepts_url");
+        return initCore(url, stockCode);
+    }
+
+    public List<Concept> initCore(String url, String stockCode) {
+        String origin = stockCode;
+        stockCode = stockCode.substring(0, 6);
         List<Concept> result = Lists.newArrayList();
         try {
             String json = OkClientUtils.get(String.format(url, stockCode));
-            result.addAll(parse(stockCode, json));
+            result.addAll(parse(origin, json));
         } catch (IOException e) {
             log.error("请求开盘啦概念失败:原因{}", e.getMessage(), e);
         }
-        conceptMapperExt.saveOrUpdateBatch(result);
+        if (!CollectionUtils.isEmpty(result)) {
+            conceptMapperExt.saveOrUpdateBatch(result);
+        }
         return result;
     }
-    
+
     public List<Concept> parse(String stockCode, String json) {
         JSONObject jsonObject = JSONObject.parseObject(json);
-        JSONArray data = jsonObject.getJSONArray("info").getJSONArray(0);
+        JSONArray data = jsonObject.getJSONArray("info");
         List<Concept> result = Lists.newArrayList();
         for (int i = 0; i < data.size(); i++) {
             JSONArray row = data.getJSONArray(i);
