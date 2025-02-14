@@ -5,4 +5,16 @@
         select * from emotion where date>=#{startDate} order by date asc
 
     </select>
+
+    <insert id="insertOrUpdate" parameterType="com.wujm1.tradesystem.entity.Emotion">
+        insert into emotion (date, open, close,
+                             high, low, ma3, ma5,
+                             last_date, chg)
+        values (#{date,jdbcType=VARCHAR}, #{open,jdbcType=DECIMAL}, #{close,jdbcType=DECIMAL},
+                #{high,jdbcType=DECIMAL}, #{low,jdbcType=DECIMAL}, #{ma3,jdbcType=DECIMAL}, #{ma5,jdbcType=DECIMAL},
+                #{lastDate,jdbcType=VARCHAR}, #{chg,jdbcType=DECIMAL}) on duplicate key
+        update date = values(date), open = values(open), close = value(close),
+        high=values(high),low = values(low),ma3=values(ma3),ma5=values(ma5),last_date=values(last_date),
+        chg=values(chg)
+    </insert>
 </mapper>

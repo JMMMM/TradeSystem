@@ -34,6 +34,7 @@ public class JiuyangongsheCrawler {
     private WencaiConditionMapperExt wencaiConditionMapperExt;
 
     public List initJiuyangongshe(String yyyyMMdd) {
+        log.info("韭菜公社数据爬取，日期：{}", yyyyMMdd);
         WencaiCondition wencaiCondition = wencaiConditionMapperExt.selectByPrimaryKey("jiuyangongshe_cookies");
         JSONObject wencaiCookies = JSONObject.parseObject(wencaiCondition.getCondition());
         String yyyyMMdd2 = DateUtils.changeDateFormat(yyyyMMdd, "yyyyMMdd", "yyyy-MM-dd");
@@ -96,6 +97,8 @@ public class JiuyangongsheCrawler {
             }
         }
         stockStatisticsMapperext.saveOrUpdateBatch(result);
+        log.info("韭菜公社数据爬取结束");
+
         return result;
     }
 }

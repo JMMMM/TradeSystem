@@ -31,6 +31,7 @@ public class KaipanlaTdCrawler {
     private StockKplMapperExt stockKplMapperExt;
 
     public List<StockKpl> initKaipanlaTd(String yyyyMMdd) {
+        log.info("开盘啦交易梯队数据爬取,日期:{}", yyyyMMdd);
         WencaiCondition wencaiCondition = wencaiConditionMapperExt.selectByPrimaryKey("kaipanla");
         String url = JSONObject.parseObject(wencaiCondition.getCondition()).getString("url");
         String yyyyMMdd2 = DateUtils.changeDateFormat(yyyyMMdd, "yyyyMMdd", "yyyy-MM-dd");
@@ -45,6 +46,7 @@ public class KaipanlaTdCrawler {
             }
         }
         stockKplMapperExt.saveOrUpdateBatch(result);
+        log.info("开盘啦交易梯队数据爬取 结束");
 
         return result;
     }

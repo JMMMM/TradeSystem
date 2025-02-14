@@ -114,7 +114,7 @@ public class EmotionCrawler {
         emotion.setMa3(ma3);
         emotion.setMa5(ma5);
         emotion.setChg(chg);
-        emotionMapperExt.insert(emotion);
+        emotionMapperExt.insertOrUpdate(emotion);
 
         log.info("插入情绪数据成功:{}", emotion.toString());
 

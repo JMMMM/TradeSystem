@@ -11,4 +11,6 @@ import java.util.List;
 public interface EmotionMapperExt extends EmotionMapper {
 
     List<Emotion> emotionQuery(@Param("startDate") String startDate);
+
+    void insertOrUpdate(Emotion emotion);
 }
