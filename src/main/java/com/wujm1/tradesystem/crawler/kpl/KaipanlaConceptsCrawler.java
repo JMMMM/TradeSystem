@@ -63,6 +63,7 @@ public class KaipanlaConceptsCrawler {
             log.error("请求开盘啦概念失败:原因{}", e.getMessage(), e);
         }
         if (!CollectionUtils.isEmpty(result)) {
+            log.info("获取概念数据code:{}，概念:{}", stockCode, result.stream().map(Concept::getConcept));
             conceptMapperExt.saveOrUpdateBatch(result);
         }
         return result;
