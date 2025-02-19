@@ -27,6 +27,7 @@ public interface StockMapperExt extends StockMapper {
 
     List<Stock> queryStockByCodes(@Param("codes") List<String> codes, @Param("date") String date);
 
-
     List<Stock> queryDragonStock(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    Stock queryStockByName(@Param("name") String name, @Param("date") String date);
 }

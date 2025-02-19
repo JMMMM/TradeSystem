@@ -3,9 +3,11 @@ package com.wujm1.tradesystem.crawler.kpl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.wujm1.tradesystem.entity.Stock;
 import com.wujm1.tradesystem.entity.StockKpl;
 import com.wujm1.tradesystem.entity.WencaiCondition;
 import com.wujm1.tradesystem.mapper.ext.StockKplMapperExt;
+import com.wujm1.tradesystem.mapper.ext.StockMapperExt;
 import com.wujm1.tradesystem.mapper.ext.WencaiConditionMapperExt;
 import com.wujm1.tradesystem.utils.DateUtils;
 import com.wujm1.tradesystem.utils.OkClientUtils;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author wujiaming
@@ -29,6 +32,8 @@ public class KaipanlaTdCrawler {
 
     @Autowired
     private StockKplMapperExt stockKplMapperExt;
+    @Autowired
+    private StockMapperExt stockMapperExt;
 
     public List<StockKpl> initKaipanlaTd(String yyyyMMdd) {
         log.info("开盘啦交易梯队数据爬取,日期:{}", yyyyMMdd);
@@ -58,9 +63,13 @@ public class KaipanlaTdCrawler {
         for (int i = 0; i < data.size(); i++) {
             JSONArray stock = data.getJSONArray(i);
             StockKpl stockKpl = new StockKpl();
-            stockKpl.setDate(yyyyMMdd);
             stockKpl.setCode(stock.getString(0));
+            stockKpl.setDate(yyyyMMdd);
             stockKpl.setName(stock.getString(1));
+            Stock stock1 = stockMapperExt.queryStockByName(stockKpl.getName(), yyyyMMdd);
+            if (Objects.nonNull(stock1)) {
+                stockKpl.setCode(stock1.getCode());
+            }
             stockKpl.setCeilingDays(stock.getInteger(15));
             stockKpl.setLastCeilingTime(stock.getString(4));
             stockKpl.setGroupName(stock.getString(5));

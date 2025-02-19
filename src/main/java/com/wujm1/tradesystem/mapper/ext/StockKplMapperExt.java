@@ -10,5 +10,4 @@ import java.util.List;
 @Mapper
 public interface StockKplMapperExt extends StockKplMapper {
     void saveOrUpdateBatch(@Param("list") List<StockKpl> stocks);
-
 }

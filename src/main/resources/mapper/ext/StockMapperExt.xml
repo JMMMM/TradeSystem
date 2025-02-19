@@ -84,4 +84,7 @@
           and #{endDate,jdbcType=VARCHAR}
           and length (remark) >0
     </select>
+    <select id="queryStockByName" resultMap="BaseResultMap">
+        select * from stock where name = #{name} and date = #{date} limit 1;
+    </select>
 </mapper>
