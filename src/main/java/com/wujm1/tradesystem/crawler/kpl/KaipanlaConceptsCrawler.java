@@ -19,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author wujiaming
@@ -63,7 +64,7 @@ public class KaipanlaConceptsCrawler {
             log.error("请求开盘啦概念失败:原因{}", e.getMessage(), e);
         }
         if (!CollectionUtils.isEmpty(result)) {
-            log.info("获取概念数据code:{}，概念:{}", stockCode, result.stream().map(Concept::getConcept));
+            log.info("获取概念数据code:{}，概念:{}", stockCode, result.stream().map(Concept::getConcept).collect(Collectors.toList()));
             conceptMapperExt.saveOrUpdateBatch(result);
         }
         return result;
