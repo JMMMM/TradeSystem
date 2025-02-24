@@ -6,6 +6,7 @@ import com.wujm1.tradesystem.crawler.kpl.KaipanlaConceptsCrawler;
 import com.wujm1.tradesystem.crawler.kpl.KaipanlaTdCrawler;
 import com.wujm1.tradesystem.crawler.stockdata.WencaiConditionCrawler;
 import com.wujm1.tradesystem.crawler.tradedate.TradeDateCrawler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 @RequestMapping("/tradeDate")
 @RestController
+@Slf4j
 public class TradeDateController {
 
     private final TradeDateCrawler tradeDateCrawler;
@@ -84,5 +86,6 @@ public class TradeDateController {
         jiuyangongshe(date);
         kaipanla(date);
         concepts(date);
+        log.info("结束");
     }
 }
