@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -47,6 +48,7 @@ public class WencaiConditionCrawler {
         this.sockDataExceptionChecker = sockDataExceptionChecker;
     }
 
+
     public void initSearchCondition(String date) {
         try {
             if (lock.tryLock(800, TimeUnit.MILLISECONDS)) {
@@ -58,10 +60,10 @@ public class WencaiConditionCrawler {
                         log.info("当日不是交易日，不拉取数据");
                         return;
                     }
-
                     log.info("拉取最近两个交易日数据：{},{},{}", tradeDateLast10.get(tradeDateLast10.size() - 1).getDate(), tradeDateLast10.get(tradeDateLast10.size() - 2).getDate(), tradeDateLast10.get(0).getDate());
                     List<Map<String, Object>> wencaiConditions = replaceCondition(tradeDateLast10.get(tradeDateLast10.size() - 1).getDate(), tradeDateLast10.get(tradeDateLast10.size() - 2).getDate(), tradeDateLast10.get(0).getDate());
                     WencaiCondition cookies = wencaiConditionMapperExt.selectByPrimaryKey("cookies");
+
 
                     int page = 1;
                     boolean flag = false;
@@ -90,13 +92,13 @@ public class WencaiConditionCrawler {
                             }
 
                             List<Stock> rows = resultProcessor.processor(result, row.get("today").toString(), row.get("yesterday").toString());
+
                             if (rows.size() == 0) {
                                 page = 1;
                                 break;
                             }
                             count += rows.size();
                             stockMapperExt.saveOrUpdateBatch(rows);
-                            int finalCount = count;
                             rows.forEach(i -> {
                                 if (!sockDataExceptionChecker.check(i)) {
                                     log.info("写入:{}", i.toString());
@@ -112,7 +114,6 @@ public class WencaiConditionCrawler {
                                 });
                             }).flatMap(i -> i).collect(Collectors.toList());
                             conceptMapperExt.saveOrUpdateBatch(concepts);
-
                             if (rows.size() < 100) {
                                 page = 1;
                                 break;
@@ -144,8 +145,7 @@ public class WencaiConditionCrawler {
         String yesterday1 = DateUtils.changeDateFormat(yesterday, "yyyyMMdd", "yyyy年MM月dd日");
         String yesterday2 = yesterday;
 
-        Map<String, WencaiCondition> wencaiConditionMap = wencaiConditionMapperExt.selectAll().stream()
-                .collect(Collectors.toMap(WencaiCondition::getConditionName, Function.identity()));
+        Map<String, WencaiCondition> wencaiConditionMap = wencaiConditionMapperExt.selectAll().stream().collect(Collectors.toMap(WencaiCondition::getConditionName, Function.identity()));
 
         List<Map<String, Object>> querys = Lists.newArrayList();
 
@@ -153,10 +153,8 @@ public class WencaiConditionCrawler {
         String base_condition = wencaiConditionMap.get("base_condition").getCondition();
 
         Map row = new HashMap();
-        row.put("query", base_query.replaceAll("today1", today1).replaceAll("today2", today2).
-                replaceAll("yesterday1", yesterday1).replaceAll("yesterday2", yesterday2).replaceAll("tendays", tendays));
-        row.put("condition", base_condition.replaceAll("today1", today1).replaceAll("today2", today2).
-                replaceAll("yesterday1", yesterday1).replaceAll("yesterday2", yesterday2).replaceAll("tendays", tendays));
+        row.put("query", base_query.replaceAll("today1", today1).replaceAll("today2", today2).replaceAll("yesterday1", yesterday1).replaceAll("yesterday2", yesterday2).replaceAll("tendays", tendays));
+        row.put("condition", base_condition.replaceAll("today1", today1).replaceAll("today2", today2).replaceAll("yesterday1", yesterday1).replaceAll("yesterday2", yesterday2).replaceAll("tendays", tendays));
         row.put("page", 1);
         row.put("today", today2);
         row.put("yesterday", yesterday2);
@@ -165,10 +163,8 @@ public class WencaiConditionCrawler {
         String ceiling_query = wencaiConditionMap.get("ceiling_query").getCondition();
         String ceiling_condition = wencaiConditionMap.get("ceiling_condition").getCondition();
         Map row2 = new HashMap();
-        row2.put("query", ceiling_query.replaceAll("today1", today1).replaceAll("today2", today2).
-                replaceAll("yesterday1", yesterday1).replaceAll("yesterday2", yesterday2).replaceAll("tendays", tendays));
-        row2.put("condition", ceiling_condition.replaceAll("today1", today1).replaceAll("today2", today2).
-                replaceAll("yesterday1", yesterday1).replaceAll("yesterday2", yesterday2).replaceAll("tendays", tendays));
+        row2.put("query", ceiling_query.replaceAll("today1", today1).replaceAll("today2", today2).replaceAll("yesterday1", yesterday1).replaceAll("yesterday2", yesterday2).replaceAll("tendays", tendays));
+        row2.put("condition", ceiling_condition.replaceAll("today1", today1).replaceAll("today2", today2).replaceAll("yesterday1", yesterday1).replaceAll("yesterday2", yesterday2).replaceAll("tendays", tendays));
         row2.put("page", 1);
         row2.put("today", today2);
         row2.put("yesterday", yesterday2);

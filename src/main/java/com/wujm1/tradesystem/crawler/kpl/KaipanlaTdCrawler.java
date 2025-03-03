@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.wujm1.tradesystem.entity.Stock;
 import com.wujm1.tradesystem.entity.StockKpl;
+import com.wujm1.tradesystem.entity.TradeDate;
 import com.wujm1.tradesystem.entity.WencaiCondition;
 import com.wujm1.tradesystem.mapper.ext.StockKplMapperExt;
 import com.wujm1.tradesystem.mapper.ext.StockMapperExt;
+import com.wujm1.tradesystem.mapper.ext.TradeDateMapperExt;
 import com.wujm1.tradesystem.mapper.ext.WencaiConditionMapperExt;
 import com.wujm1.tradesystem.utils.DateUtils;
 import com.wujm1.tradesystem.utils.OkClientUtils;
@@ -34,6 +36,16 @@ public class KaipanlaTdCrawler {
     private StockKplMapperExt stockKplMapperExt;
     @Autowired
     private StockMapperExt stockMapperExt;
+    @Autowired
+    private TradeDateMapperExt tradeDateMapperExt;
+
+    public List<StockKpl> initRange(String start, String end) {
+        List<TradeDate> tradeDates = tradeDateMapperExt.showAllTradeDate(start, end);
+        for (TradeDate tradeDate : tradeDates) {
+            initKaipanlaTd(tradeDate.getDate());
+        }
+        return null;
+    }
 
     public List<StockKpl> initKaipanlaTd(String yyyyMMdd) {
         log.info("开盘啦交易梯队数据爬取,日期:{}", yyyyMMdd);
