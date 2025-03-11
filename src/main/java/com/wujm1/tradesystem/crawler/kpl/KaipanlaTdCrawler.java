@@ -52,6 +52,11 @@ public class KaipanlaTdCrawler {
         WencaiCondition wencaiCondition = wencaiConditionMapperExt.selectByPrimaryKey("kaipanla");
         String url = JSONObject.parseObject(wencaiCondition.getCondition()).getString("url");
         String yyyyMMdd2 = DateUtils.changeDateFormat(yyyyMMdd, "yyyyMMdd", "yyyy-MM-dd");
+        TradeDate tradeDate = tradeDateMapperExt.selectByPrimaryKey(yyyyMMdd);
+        if(Objects.isNull(tradeDate)){
+            log.error("日期{}不是交易日", yyyyMMdd);
+            return null;
+        }
         List<StockKpl> result = Lists.newArrayList();
         for (int i = 1; i <= 5; i++) {
             try {
