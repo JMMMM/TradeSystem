@@ -2,6 +2,7 @@ package com.wujm1.tradesystem.scheduler.crawler.kaipanla;
 
 import com.wujm1.tradesystem.crawler.jiuyangongshe.JiuyangongsheCrawler;
 import com.wujm1.tradesystem.crawler.kpl.KaipanlaConceptsCrawler;
+import com.wujm1.tradesystem.crawler.kpl.KaipanlaTdCrawler;
 import com.wujm1.tradesystem.entity.Stock;
 import com.wujm1.tradesystem.mapper.ext.StockMapperExt;
 import com.wujm1.tradesystem.utils.DateUtils;
@@ -23,14 +24,14 @@ public class KaipanlaConceptsCrawlerScheduler {
     
     @Autowired
     private KaipanlaConceptsCrawler kaipanlaConceptsCrawler;
-    
     @Autowired
-    private StockMapperExt stockMapperExt;
-    
+    private KaipanlaTdCrawler kaipanlaTdCrawler;
+
     @Scheduled(cron = "0 30 23 * * ?")
     public void run() {
         String today = DateUtils.getDateStr(new Date(), "yyyyMMdd");
         log.info("爬取开盘啦概念开始");
+        kaipanlaTdCrawler.initKaipanlaTd(today);
         kaipanlaConceptsCrawler.initKaipanlaConcepts(today);
         log.info("爬取开盘啦概念结束");
     }

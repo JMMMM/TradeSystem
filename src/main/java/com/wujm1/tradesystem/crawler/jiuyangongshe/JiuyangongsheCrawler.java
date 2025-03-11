@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.wujm1.tradesystem.entity.StockStatistics;
+import com.wujm1.tradesystem.entity.TradeDate;
 import com.wujm1.tradesystem.entity.WencaiCondition;
 import com.wujm1.tradesystem.mapper.StockStatisticsMapper;
 import com.wujm1.tradesystem.mapper.ext.StockStatisticsMapperExt;
+import com.wujm1.tradesystem.mapper.ext.TradeDateMapperExt;
 import com.wujm1.tradesystem.mapper.ext.WencaiConditionMapperExt;
 import com.wujm1.tradesystem.utils.DateUtils;
 import com.wujm1.tradesystem.utils.StockCodeFormatter;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author wujiaming
@@ -32,8 +35,15 @@ public class JiuyangongsheCrawler {
     private StockStatisticsMapperExt stockStatisticsMapperext;
     @Autowired
     private WencaiConditionMapperExt wencaiConditionMapperExt;
+    @Autowired
+    private TradeDateMapperExt tradeDateMapperExt;
 
     public List initJiuyangongshe(String yyyyMMdd) {
+        TradeDate tradedate = tradeDateMapperExt.selectByPrimaryKey(yyyyMMdd);
+        if (Objects.isNull(tradedate)) {
+            log.error("日期{}不是交易日", yyyyMMdd);
+            return null;
+        }
         log.info("韭菜公社数据爬取，日期：{}", yyyyMMdd);
         WencaiCondition wencaiCondition = wencaiConditionMapperExt.selectByPrimaryKey("jiuyangongshe_cookies");
         JSONObject wencaiCookies = JSONObject.parseObject(wencaiCondition.getCondition());
