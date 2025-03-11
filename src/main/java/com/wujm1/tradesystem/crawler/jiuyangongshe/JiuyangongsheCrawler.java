@@ -79,6 +79,7 @@ public class JiuyangongsheCrawler {
         } catch (IOException e) {
             log.error("请求韭研公社接口失败:原因{}", e.getMessage(), e);
         }
+        log.info(json);
         JSONArray data = JSONObject.parseObject(json).getJSONArray("data");
         List<StockStatistics> result = Lists.newArrayList();
         for (int i = 1; i < data.size(); i++) {
