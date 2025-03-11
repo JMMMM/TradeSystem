@@ -73,41 +73,42 @@ public class JiuyangongsheCrawler {
                 .build();
         Response response = null;
         String json = null;
+        List<StockStatistics> result = Lists.newArrayList();
         try {
             response = client.newCall(request).execute();
             json = response.body().string();
+            log.info(json);
+            JSONArray data = JSONObject.parseObject(json).getJSONArray("data");
+            for (int i = 1; i < data.size(); i++) {
+                JSONObject jsonObject = data.getJSONObject(i);
+                String groupName = jsonObject.getString("name");
+                JSONArray list = jsonObject.getJSONArray("list");
+                for (int j = 0; j < list.size(); j++) {
+                    JSONObject stock = list.getJSONObject(j);
+                    StockStatistics stockStatistics = new StockStatistics();
+                    stockStatistics.setDate(yyyyMMdd);
+                    //sz002846
+                    String code = StockCodeFormatter.format(stock.getString("code"));
+                    stockStatistics.setCode(code);
+                    String name = StockCodeFormatter.format(stock.getString("name"));
+                    stockStatistics.setName(name);
+                    stockStatistics.setGroupName(groupName);
+                    JSONObject action_info = stock.getJSONObject("article").getJSONObject("action_info");
+                    stockStatistics.setCeilingDays(action_info.getInteger("day"));
+                    String ceilingType = action_info.getString("num");
+                    stockStatistics.setCeilingType(ceilingType);
+                    String ceilingTime = action_info.getString("time");
+                    stockStatistics.setCeilingTime(ceilingTime);
+                    String expound = action_info.getString("expound");
+                    stockStatistics.setReason(expound);
+                    result.add(stockStatistics);
+                }
+            }
+            stockStatisticsMapperext.saveOrUpdateBatch(result);
         } catch (IOException e) {
             log.error("请求韭研公社接口失败:原因{}", e.getMessage(), e);
         }
-        log.info(json);
-        JSONArray data = JSONObject.parseObject(json).getJSONArray("data");
-        List<StockStatistics> result = Lists.newArrayList();
-        for (int i = 1; i < data.size(); i++) {
-            JSONObject jsonObject = data.getJSONObject(i);
-            String groupName = jsonObject.getString("name");
-            JSONArray list = jsonObject.getJSONArray("list");
-            for (int j = 0; j < list.size(); j++) {
-                JSONObject stock = list.getJSONObject(j);
-                StockStatistics stockStatistics = new StockStatistics();
-                stockStatistics.setDate(yyyyMMdd);
-                //sz002846
-                String code = StockCodeFormatter.format(stock.getString("code"));
-                stockStatistics.setCode(code);
-                String name = StockCodeFormatter.format(stock.getString("name"));
-                stockStatistics.setName(name);
-                stockStatistics.setGroupName(groupName);
-                JSONObject action_info = stock.getJSONObject("article").getJSONObject("action_info");
-                stockStatistics.setCeilingDays(action_info.getInteger("day"));
-                String ceilingType = action_info.getString("num");
-                stockStatistics.setCeilingType(ceilingType);
-                String ceilingTime = action_info.getString("time");
-                stockStatistics.setCeilingTime(ceilingTime);
-                String expound = action_info.getString("expound");
-                stockStatistics.setReason(expound);
-                result.add(stockStatistics);
-            }
-        }
-        stockStatisticsMapperext.saveOrUpdateBatch(result);
+
         log.info("韭菜公社数据爬取结束");
 
         return result;
