@@ -107,7 +107,7 @@ public class TradeDateController {
     public void crawler(@RequestParam("date") String date) {
         wencai(date);
         emotion(date);
-        jiuyangongshe(date);
+//        jiuyangongshe(date);
         kaipanla(date);
         concepts(date);
         log.info("结束");
