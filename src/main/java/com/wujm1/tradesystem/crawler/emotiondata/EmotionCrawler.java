@@ -1,5 +1,6 @@
 package com.wujm1.tradesystem.crawler.emotiondata;
 
+import cn.hutool.http.Header;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -54,6 +55,7 @@ public class EmotionCrawler {
         String query = wencaiConditionMap.get("emotion_query").getCondition().replaceAll("today2", today2).replaceAll("today1", today1).replaceAll("yesterday2", yesterday2);
         String condition = wencaiConditionMap.get("emotion_condition").getCondition().replaceAll("today2", today2).replaceAll("today1", today1).replaceAll("yesterday2", yesterday2);
         String wencai_url = wencaiConditionMap.get("emtion_url").getCondition();
+        String cookies = wencaiConditionMap.get("cookies").getCondition();
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("query", query)
                 .addFormDataPart("condition", condition)
@@ -67,7 +69,7 @@ public class EmotionCrawler {
         Request request = new Request.Builder()
                 .url(wencai_url)
                 .method("POST", body)
-                .addHeader("Cookie", "other_uid=Ths_iwencai_Xuangu_xqvhlculvxjnw4osr41up6c3al8um9q4; ta_random_userid=ukoetmp31g; cid=61f00c6cae4404a7c5dc2a67ff81f10a1704935377; cid=61f00c6cae4404a7c5dc2a67ff81f10a1704935377; ComputerID=61f00c6cae4404a7c5dc2a67ff81f10a1704935377; WafStatus=0; guideState=1; user=MDpteF81MzIyMjI5MzE6Ok5vbmU6NTAwOjU0MjIyMjkzMTo3LDExMTExMTExMTExLDQwOzQ0LDExLDQwOzYsMSw0MDs1LDEsNDA7MSwxMDEsNDA7MiwxLDQwOzMsMSw0MDs1LDEsNDA7OCwwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMSw0MDsxMDIsMSw0MDoxNjo6OjUzMjIyMjkzMToxNzA2MjU3ODcxOjo6MTU5NDM0NTY4MDoyNjc4NDAwOjA6MTY2YWU2ODM5ZWZjODQyMjZhZTI3OWQ0MTA4MDk5OGEwOmRlZmF1bHRfNDow; userid=532222931; u_name=mx_532222931; escapename=mx_532222931; ticket=db855d2ed9f1dc94d4de9afdd2711c3a; user_status=0; utk=06ab70f98e44c4a4806e032824c24f00; wencai_pc_version=1; v=A1JP610FYznzvp_FHb3x491aoxMxY1kJiElKaR2eeuzwcvyNBPOmDVj3moXv")
+                .addHeader("Cookie", cookies)
                 .build();
         Response response = null;
         try {
