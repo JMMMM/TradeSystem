@@ -10,6 +10,7 @@ import com.wujm1.tradesystem.mapper.ext.StockMapperExt;
 import com.wujm1.tradesystem.mapper.ext.TradeDateMapperExt;
 import com.wujm1.tradesystem.utils.TableBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -58,13 +59,18 @@ public class TableDataService {
         tableData.setStartDate(stock.getDate());
         tableData.setConcepts(Arrays.asList(stock.getConcepts().split(",")));
         tableData.setEndDate(stock.getDate());
+        tableData.setMinLow(stock.getLow());
+        tableData.setMaxHigh(stock.getHigh());
         tableData.setMinStock(stock);
         tableData.setMaxStock(stock);
         return tableData;
     }
 
     public List<TableData> nextDate(List<TableData> tableDatas, String date) {
-        List<String> stockCodes = tableDatas.stream().map(TableData::getCode).collect(Collectors.toList());
+        List<String> stockCodes = tableDatas.stream().filter(i -> i.getCnt() < 3).map(TableData::getCode).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(stockCodes)) {
+            return tableDatas;
+        }
         List<Stock> stocks = stockMapperExt.queryStockByCodes(stockCodes, date);
         Map<String, Stock> stockMap = stocks.stream().collect(Collectors.toMap(Stock::getCode, stock -> stock));
         for (TableData tableData : tableDatas) {
@@ -75,14 +81,22 @@ public class TableDataService {
             //今日最高价大于昨日收盘价，那么就判断为未结束
             if (stock.getHigh().compareTo(tableData.getMaxStock().getHigh()) > 0) {
                 tableData.setEndDate(stock.getDate());
+                tableData.setCnt(1);
                 tableData.setMaxStock(stock);
+                tableData.setMinLow(stock.getLow());
+                tableData.setMaxHigh(stock.getHigh());
+
                 if (stock.getCeilingDays() > 0) {
                     tableData.setK(tableData.getK() + 1);
                 }
-            } else if (stock.getClose().compareTo(tableData.getMaxStock().getrClose()) > 0) {
-                //无效k线要到下一天确定
+            } else if (isWrapper(stock, tableData.getMaxStock())) {
+                //无效k线要到下一天确定,但以包裹那根K线为准
+                tableData.setEndDate(stock.getDate());
+                tableData.setMinLow(stock.getLow().compareTo(tableData.getMinLow()) < 0 ? stock.getLow() : tableData.getMinLow());
+                tableData.setMaxHigh(stock.getHigh().compareTo(tableData.getMaxHigh()) > 0 ? stock.getHigh() : tableData.getMaxHigh());
+            } else {
+                tableData.setCnt(tableData.getCnt() + 1);
             }
-            tableData.setIncreaseRate(tableData.getMaxStock().getClose().divide(tableData.getMinStock().getrClose(), 2));
         }
         return tableDatas;
     }
@@ -99,5 +113,9 @@ public class TableDataService {
         stock2 = stock2.stream().filter(i -> Optional.ofNullable(i.getCeilingDays()).orElse(0) == 1 && !stock1Codes.contains(i.getCode())).collect(Collectors.toList());
         result.addAll(stock2);
         return result;
+    }
+
+    private Boolean isWrapper(Stock stock, Stock lastStock) {
+        return lastStock.getHigh().compareTo(stock.getHigh()) >= 0 && lastStock.getLow().compareTo(stock.getLow()) <= 0;
     }
 }

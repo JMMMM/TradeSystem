@@ -12,7 +12,7 @@ public final class TableBuilder {
         StringBuilder sb = new StringBuilder();
 
         // 添加表头
-        sb.append(String.format(HEADER, "code", "name", "k", "start", "end", "涨幅", "max(concepts)")).append("</br>");
+        sb.append(String.format(HEADER, "code　　　　", "name　　", "k ", "start    ", "end      ", "涨幅", "max(concepts)")).append("</br>");
 
         // 添加分隔线
         sb.append(SEPARATOR).append("</br>");

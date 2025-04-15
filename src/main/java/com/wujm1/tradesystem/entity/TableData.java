@@ -18,4 +18,10 @@ public class TableData {
     private Stock minStock;
 
     private Stock maxStock;
+
+    private BigDecimal minLow;
+
+    private BigDecimal maxHigh;
+
+    private int cnt = 1;
 }
