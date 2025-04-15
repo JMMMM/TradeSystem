@@ -87,4 +87,9 @@
     <select id="queryStockByName" resultMap="BaseResultMap">
         select * from stock where name = #{name} and date = #{date} order by length(code) desc limit 1;
     </select>
+    <select id="queryStockByTime" resultMap="BaseResultMap">
+        select *
+        from stock
+        where date between #{start,jdbcType=VARCHAR} and #{end,jdbcType=VARCHAR}
+    </select>
 </mapper>

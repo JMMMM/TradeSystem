@@ -35,6 +35,8 @@
     <result column="last_date" jdbcType="VARCHAR" property="lastDate" />
     <result column="call_amount" jdbcType="DECIMAL" property="callAmount" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="ceiling_struct" jdbcType="VARCHAR" property="ceilingStruct" />
+    <result column="k_type" jdbcType="VARCHAR" property="kType" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.wujm1.tradesystem.entity.Stock">
     <!--
@@ -64,7 +66,8 @@
       fde, fcb, tdzlje, call_vol, 
       ceiling_type, free_market, ceiling_days, 
       call_vol_rate, last_date, call_amount, 
-      remark, concepts)
+      remark, ceiling_struct, k_type, 
+      concepts)
     values (#{date,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
       #{open,jdbcType=DECIMAL}, #{close,jdbcType=DECIMAL}, #{high,jdbcType=DECIMAL}, 
       #{low,jdbcType=DECIMAL}, #{rClose,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, 
@@ -74,7 +77,8 @@
       #{fde,jdbcType=DECIMAL}, #{fcb,jdbcType=DECIMAL}, #{tdzlje,jdbcType=DECIMAL}, #{callVol,jdbcType=DECIMAL}, 
       #{ceilingType,jdbcType=VARCHAR}, #{freeMarket,jdbcType=DECIMAL}, #{ceilingDays,jdbcType=INTEGER}, 
       #{callVolRate,jdbcType=DECIMAL}, #{lastDate,jdbcType=VARCHAR}, #{callAmount,jdbcType=DECIMAL}, 
-      #{remark,jdbcType=VARCHAR}, #{concepts,jdbcType=LONGVARCHAR})
+      #{remark,jdbcType=VARCHAR}, #{ceilingStruct,jdbcType=VARCHAR}, #{kType,jdbcType=VARCHAR}, 
+      #{concepts,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.wujm1.tradesystem.entity.Stock">
     <!--
@@ -170,6 +174,12 @@
       <if test="remark != null">
         remark,
       </if>
+      <if test="ceilingStruct != null">
+        ceiling_struct,
+      </if>
+      <if test="kType != null">
+        k_type,
+      </if>
       <if test="concepts != null">
         concepts,
       </if>
@@ -261,6 +271,12 @@
       </if>
       <if test="remark != null">
         #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="ceilingStruct != null">
+        #{ceilingStruct,jdbcType=VARCHAR},
+      </if>
+      <if test="kType != null">
+        #{kType,jdbcType=VARCHAR},
       </if>
       <if test="concepts != null">
         #{concepts,jdbcType=LONGVARCHAR},

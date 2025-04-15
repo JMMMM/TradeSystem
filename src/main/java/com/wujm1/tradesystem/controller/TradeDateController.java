@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.wujm1.tradesystem.service.TableDataService;
 
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -47,7 +48,9 @@ public class TradeDateController {
 
     private final ThreadPoolExecutor threadPoolExecutor;
 
-    public TradeDateController(TradeDateCrawler tradeDateCrawler, WencaiConditionCrawler wencaiConditionCrawler, EmotionCrawler emotionCrawler, JiuyangongsheCrawler jiuyangongsheCrawler, KaipanlaTdCrawler kaipanlaTdCrawler, KaipanlaConceptsCrawler kaipanlaConceptsCrawler, TradeDateMapperExt tradeDateMapperExt) {
+    private final TableDataService tableDataService;
+
+    public TradeDateController(TradeDateCrawler tradeDateCrawler, WencaiConditionCrawler wencaiConditionCrawler, EmotionCrawler emotionCrawler, JiuyangongsheCrawler jiuyangongsheCrawler, KaipanlaTdCrawler kaipanlaTdCrawler, KaipanlaConceptsCrawler kaipanlaConceptsCrawler, TradeDateMapperExt tradeDateMapperExt, TableDataService tableDataService) {
         this.tradeDateCrawler = tradeDateCrawler;
         this.wencaiConditionCrawler = wencaiConditionCrawler;
         this.emotionCrawler = emotionCrawler;
@@ -55,6 +58,7 @@ public class TradeDateController {
         this.kaipanlaTdCrawler = kaipanlaTdCrawler;
         this.kaipanlaConceptsCrawler = kaipanlaConceptsCrawler;
         this.tradeDateMapperExt = tradeDateMapperExt;
+        this.tableDataService = tableDataService;
         this.threadPoolExecutor = new ThreadPoolExecutor(10, 10, 1, TimeUnit.MINUTES, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
@@ -109,7 +113,12 @@ public class TradeDateController {
         emotion(date);
         jiuyangongshe(date);
         kaipanla(date);
-        concepts(date);
+//        concepts(date);
         log.info("结束");
+    }
+
+    @GetMapping("/zhouqi")
+    public String zhouqi(@RequestParam("start") String start, @RequestParam("end") String end) {
+        return tableDataService.zhouqi(start, end);
     }
 }
